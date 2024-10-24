@@ -1,35 +1,24 @@
-import pyautogui
-import pymsgbox
-import time
-import tkinter as tk
-from tkinter import messagebox, Text
 import cv2
 import os
-from datetime import datetime
+import pyautogui
+import pymsgbox
 import threading
+import time
+import tkinter as tk
+from datetime import datetime
+from functions.mouse_keyboard import simulate_mouse_movements, cycle_through_tabs
+from functions.seller_central import go_to_seller_central_pricing_health
+from functions.basecamp import go_to_basecamp
+from functions.notepad import create_notepad_report
+from functions.vs_code import create_vs_code
+from functions.td import td
+from tkinter import Text
+from utils.initial_values import default_report, default_code
 
 pyautogui.PAUSE = 0.2
 
-default_report = """
-Accomplishment Report
-
-Web Scraping Automation:
-Successfully developed multiple web scraping scripts using Puppeteer and Cheerio for extracting detailed product information, including specifications, pricing, and images, from e-commerce websites like Sockwell, Footmates, and Old Friend Footwear.
-
-Data Cleanup and Formatting:
-Implemented efficient data extraction and cleanup processes, removing unnecessary newline characters and extra spaces, ensuring clean and structured data output.
-
-Transition to Cheerio:
-Converted Puppeteer-based scripts to Cheerio for faster scraping, improving performance in scraping product details and subheaders from web pages.
-
-Browser Automation Enhancements:
-Integrated the Stealth plugin with Puppeteer to handle automated browser interactions more reliably, including tasks such as logging in to websites and handling hidden elements.
-
-API Integration & Middleware Improvements:
-Enhanced the functionality of the makeApiRequest function in React components, improving error handling by adding navigation to the /login route on error conditions.
-"""
-
 report_content = default_report 
+code_content = default_code
 camera_running = threading.Event()
 
 def open_camera_cv2():
@@ -54,91 +43,11 @@ def open_camera_cv2():
   cap.release()
   cv2.destroyAllWindows()
 
-def simulate_mouse_movements(repeat=3):
-  for _ in range(repeat):
-    pyautogui.moveTo(400, 400, duration=0.15)
-    pyautogui.moveTo(400, 800, duration=0.15)
-    pyautogui.moveTo(1200, 800, duration=0.15)
-    pyautogui.moveTo(1200, 400, duration=0.15)
-
-def smooth_scroll(scroll_amount, duration):
-  steps = 100
-  scroll_per_step = scroll_amount // steps
-  time_per_step = duration / steps
-  for _ in range(steps):
-    pyautogui.scroll(scroll_per_step)
-    time.sleep(time_per_step)
-
-def cycle_through_tabs(repeat=10):
-  for _ in range(repeat):
-    pyautogui.hotkey('ctrl', 'tab')
-    time.sleep(1)
-
-def go_to_seller_central_pricing_health():
-  pyautogui.hotkey('ctrl', 't')
-  time.sleep(1)
-  pyautogui.write('sellercentral.amazon.com/home', interval=0.15)
-  pyautogui.press('enter')
-  time.sleep(1)
-  simulate_mouse_movements()
-  pyautogui.moveTo(22, 143, duration=0.2)
-  pyautogui.click()
-  time.sleep(1)
-  pyautogui.moveTo(127, 290, duration=0.2)
-  pyautogui.moveTo(418, 297, duration=0.2)
-  pyautogui.click()
-  simulate_mouse_movements(2)
-  pyautogui.moveTo(900, 500, duration=0.2)
-  smooth_scroll(-5000, 2)
-  pyautogui.moveTo(956, 905, duration=0.2)
-  pyautogui.click()
-  smooth_scroll(-7500, 2)
-  simulate_mouse_movements(1)
-  pyautogui.hotkey('ctrl', 'w')
-
-def go_to_basecamp():
-  pyautogui.hotkey('ctrl', 't')
-  time.sleep(1)
-  pyautogui.write('3.basecamp.com/3354094/projects', interval=0.15)
-  pyautogui.press('enter')
-  time.sleep(1)
-  simulate_mouse_movements()
-  pyautogui.moveTo(900, 500, duration=0.2)
-  smooth_scroll(-1000, 1)
-  pyautogui.moveTo(1245, 140, duration=0.2)
-  pyautogui.click()
-  time.sleep(1)
-  pyautogui.moveTo(1342, 196, duration=0.2)
-  pyautogui.click()
-  pyautogui.write('rundown', interval=0.15)
-  time.sleep(1)
-  pyautogui.press('enter')
-  pyautogui.moveTo(900, 500, duration=0.2)
-  time.sleep(1)
-  pyautogui.hotkey('ctrl', 'w')
-
-def create_notepad_report(report_content):
-  pyautogui.hotkey('win', 'r')
-  pyautogui.write('notepad', interval=0.05)
-  pyautogui.press('enter')
-  time.sleep(1)
-  pyautogui.hotkey('win', 'up')
-
-  pyautogui.write(report_content, interval=0.1)
-  pyautogui.hotkey('ctrl', 'a')
-  time.sleep(1)
-  pyautogui.press('backspace')
-  time.sleep(1)
-  pyautogui.hotkey('ctrl', 'w')
-  time.sleep(1)
-  pyautogui.hotkey('alt', 'tab')
-  time.sleep(1)
-
 def main():
-  global report_content  
+  global report_content, code_content  
   root = tk.Tk()
   root.title("Unlimited Rice")
-  root.geometry("500x350")
+  root.geometry("500x400")
   root.resizable(False, True)
 
   font_style = ("Arial", 12)
@@ -147,6 +56,8 @@ def main():
   basecamp = tk.BooleanVar()
   cycle_tabs = tk.BooleanVar()
   notepad_report = tk.BooleanVar()
+  vs_code = tk.BooleanVar()
+  td_nw = tk.BooleanVar()
 
   def show_report_input():
     report_window = tk.Toplevel(root)
@@ -163,6 +74,21 @@ def main():
 
     tk.Button(report_window, text="Save", command=save_report, cursor="hand2", font=('Arial', 12), bg="green", fg="white").pack(padx=20, pady=25, fill='x')
 
+  def show_vs_code_input():
+    vs_code_window = tk.Toplevel(root)
+    vs_code_window.attributes("-fullscreen", True)
+    vs_code_window.title("Edit Report")
+    vs_code_text = Text(vs_code_window, wrap='word')
+    vs_code_text.insert(tk.END, code_content) 
+    vs_code_text.pack(fill='both', expand=True)
+
+    def save_vs_code():
+      global code_content 
+      code_content = vs_code_text.get("1.0", tk.END).strip() 
+      vs_code_window.destroy()
+
+    tk.Button(vs_code_window, text="Save", command=save_vs_code, cursor="hand2", font=('Arial', 12), bg="green", fg="white").pack(padx=20, pady=25, fill='x')
+
   tk.Label(root, text="Menu Selection:", font=("Arial", 14)).pack(pady=5)
 
   tk.Checkbutton(root, text="Simulate Mouse Movements", variable=simulate_mouse, font=font_style, cursor="hand2").pack(anchor='w')
@@ -176,6 +102,13 @@ def main():
   tk.Checkbutton(notepad_frame, text="Create Notepad Report", variable=notepad_report, font=font_style, cursor="hand2").pack(side="left", anchor='w')
   tk.Button(notepad_frame, text="Edit Report", command=show_report_input, font=font_style, cursor="hand2").pack(side="right", padx=10)
   notepad_frame.pack(anchor='w', pady=1)
+
+  vs_code_frame = tk.Frame(root)
+  tk.Checkbutton(vs_code_frame, text="Code Javascript in VS Code", variable=vs_code, font=font_style, cursor="hand2").pack(side="left", anchor='w')
+  tk.Button(vs_code_frame, text="Edit Code", command=show_vs_code_input, font=font_style, cursor="hand2").pack(side="right", padx=10)
+  vs_code_frame.pack(anchor='w', pady=1)
+
+  tk.Checkbutton(root, text="Auto Yes Bypass", variable=td_nw, font=font_style, cursor="hand2").pack(anchor='w')
 
   def execute_selected():
     result = pymsgbox.confirm(text='Run the selected tasks in a loop? Make sure that the next active tab is your browser', title='Confirm', buttons=['OK', 'Cancel'])
@@ -200,6 +133,10 @@ def main():
           cycle_through_tabs()
         if notepad_report.get():
           create_notepad_report(report_content)
+        if vs_code.get():
+          create_vs_code(code_content)
+        if td_nw.get():
+          td()
     except Exception as e:
       pymsgbox.alert(text='Script successfully stopped', title='Alert', button='Ok')
       print(f"An error occurred: {e}")
@@ -212,3 +149,5 @@ def main():
 
 if __name__ == "__main__":
   main()
+  
+#python -m PyInstaller --onefile --windowed --add-data "images/not_working_final.png;images" main_app.py
