@@ -1,3 +1,4 @@
+import sys
 import cv2
 import os
 import pyautogui
@@ -49,6 +50,11 @@ def main():
   root.title("Unlimited Rice")
   root.geometry("500x400")
   root.resizable(False, True)
+  if hasattr(sys, "_MEIPASS"):
+    icon_path = os.path.join(sys._MEIPASS, "images/unli_rice.ico")
+  else:
+    icon_path = "images/unli_rice.ico"
+  root.iconbitmap(icon_path)
 
   font_style = ("Arial", 12)
   simulate_mouse = tk.BooleanVar()
@@ -150,4 +156,4 @@ def main():
 if __name__ == "__main__":
   main()
   
-#python -m PyInstaller --onefile --windowed --add-data "images/not_working_final.png;images" main_app.py
+#python -m PyInstaller --onefile --windowed --icon="images/unli_rice.ico" --add-data "images/not_working_final.png;images" main_app.py
