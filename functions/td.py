@@ -12,19 +12,30 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 image_path = resource_path('images/not_working_final.png')
+image_path_2 = resource_path('images/not_working_final_2.png')
 
 def td():
   while True:
     try:
-      location = pyautogui.locateOnScreen(image_path, confidence=0.5)  
-      if location is not None:
-        print("Image found!")
-        break
-    except pyautogui.ImageNotFoundException:
-      print("Image not found.")
+      location1, location2 = None, None
       
+      try:
+        location1 = pyautogui.locateOnScreen(image_path, confidence=0.5)
+      except pyautogui.ImageNotFoundException:
+        pass
+
+      try:
+        location2 = pyautogui.locateOnScreen(image_path_2, confidence=0.5)
+      except pyautogui.ImageNotFoundException:
+        pass
+
+      if location1 is not None or location2 is not None:
+        break
+
+    except Exception as e:
+      print(f"Unexpected error: {e}")
+
     if pyautogui.position() == (0, 0):
-      print("Failsafe triggered")
       break
 
     time.sleep(1)

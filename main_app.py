@@ -13,6 +13,7 @@ from functions.basecamp import go_to_basecamp
 from functions.notepad import create_notepad_report
 from functions.vs_code import create_vs_code
 from functions.td import td
+from functions.td_ob import td_ob
 from tkinter import Text
 from utils.initial_values import default_report, default_code
 
@@ -48,10 +49,10 @@ def main():
   global report_content, code_content  
   root = tk.Tk()
   root.title("Unlimited Rice")
-  root.geometry("500x400")
+  root.geometry("500x460")
   root.resizable(False, True)
   if hasattr(sys, "_MEIPASS"):
-    icon_path = os.path.join(sys._MEIPASS, "images/unli_rice.ico")
+    icon_path = os.path.join(sys._MEIPASS, "images", "unli_rice.ico")
   else:
     icon_path = "images/unli_rice.ico"
   root.iconbitmap(icon_path)
@@ -64,6 +65,13 @@ def main():
   notepad_report = tk.BooleanVar()
   vs_code = tk.BooleanVar()
   td_nw = tk.BooleanVar()
+  td_ob_bool = tk.BooleanVar()
+  
+  def validate_input(new_value):
+    if new_value == "" or new_value.isdigit():
+        return True
+    return False
+  vcmd = (root.register(validate_input), '%P')
 
   def show_report_input():
     report_window = tk.Toplevel(root)
@@ -115,11 +123,20 @@ def main():
   vs_code_frame.pack(anchor='w', pady=1)
 
   tk.Checkbutton(root, text="Auto Yes Bypass", variable=td_nw, font=font_style, cursor="hand2").pack(anchor='w')
-
-  def execute_selected():
+  
+  minutes_var = tk.StringVar(value="9")
+  td_ob_frame = tk.Frame(root)
+  tk.Checkbutton(td_ob_frame, text="OB Bypass (Minutes)", variable=td_ob_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
+  tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=3, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=10)
+  td_ob_frame.pack(anchor='w', pady=1)
+  tk.Label(root, text="* Cannot be selected along with other choices", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=30)
+  
+  def execute_selected_thread():
     result = pymsgbox.confirm(text='Run the selected tasks in a loop? Make sure that the next active tab is your browser', title='Confirm', buttons=['OK', 'Cancel'])
     if result == 'Cancel':
       return
+    
+    root.withdraw()
     
     try:
       global camera_running 
@@ -143,17 +160,23 @@ def main():
           create_vs_code(code_content)
         if td_nw.get():
           td()
+        if td_ob_bool.get():
+          minutes_value = minutes_var.get()
+          td_ob(minutes_value)
+          td_ob_bool.set(False)
+          td_nw.set(True)
     except Exception as e:
       pymsgbox.alert(text='Script successfully stopped', title='Alert', button='Ok')
       print(f"An error occurred: {e}")
     finally:
+      root.deiconify() 
       camera_running.clear()
 
-  tk.Button(root, text="Start", command=execute_selected, font=("Arial", 14, 'bold'), bg="green", fg="white", cursor="hand2").pack(pady=(50,0), padx=20, fill='x')
+  tk.Button(root, text="Start", command=lambda: threading.Thread(target=execute_selected_thread, daemon=True).start(), font=("Arial", 14, 'bold'), bg="green", fg="white", cursor="hand2").pack(pady=(50,0), padx=20, fill='x')
   tk.Label(root, text="Note: Move your cursor to top-left most part of your main screen to force stop", font=("Arial", 10, 'bold'), fg='red').pack(pady=(0,0))
   root.mainloop()
 
 if __name__ == "__main__":
   main()
   
-#python -m PyInstaller --onefile --windowed --icon="images/unli_rice.ico" --add-data "images/not_working_final.png;images" main_app.py
+#python -m PyInstaller --onefile --windowed --icon="images/unli_rice.ico" --add-data "images/unli_rice.ico;images" --add-data "images/not_working_final.png;images" --add-data "images/not_working_final_2.png;images" --add-data "images/start_working_again.png;images" --add-data "images/start_working_again_2.png;images" main_app.py
