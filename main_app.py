@@ -16,6 +16,7 @@ from functions.td import td
 from functions.td_ob import td_ob
 from tkinter import Text
 from utils.initial_values import default_report, default_code
+from utils.toast import show_toast
 
 pyautogui.PAUSE = 0.2
 
@@ -31,14 +32,16 @@ def open_camera_cv2():
 
   image_saved = False 
 
+  pictures_path = os.path.join(os.path.expanduser("~"), "Pictures", "_Unli Rice_")
+  os.makedirs(pictures_path, exist_ok=True) 
+
   while camera_running.is_set(): 
     ret, frame = cap.read()
     if ret and not image_saved: 
       timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-      downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
-      filename = os.path.join(downloads_path, f"unli_rice_{timestamp}.jpg")
+      filename = os.path.join(pictures_path, f"unli_rice_{timestamp}.jpg")
       cv2.imwrite(filename, frame)
-      image_saved = True  
+      image_saved = True 
     
     time.sleep(1)
 
@@ -51,6 +54,8 @@ def main():
   root.title("Unlimited Rice")
   root.geometry("500x460")
   root.resizable(False, True)
+  root.attributes("-alpha", 0.6)
+  
   if hasattr(sys, "_MEIPASS"):
     icon_path = os.path.join(sys._MEIPASS, "images", "unli_rice.ico")
   else:
@@ -125,8 +130,10 @@ def main():
   tk.Checkbutton(root, text="Auto Yes Bypass", variable=td_nw, font=font_style, cursor="hand2").pack(anchor='w')
   
   minutes_var = tk.StringVar(value="9")
+  seconds_var = tk.StringVar(value="0")
   td_ob_frame = tk.Frame(root)
-  tk.Checkbutton(td_ob_frame, text="OB Bypass (Minutes)", variable=td_ob_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
+  tk.Checkbutton(td_ob_frame, text="OB Bypass (Minutes, Seconds)", variable=td_ob_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
+  tk.Spinbox(td_ob_frame, textvariable=seconds_var, from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=5)
   tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=3, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=10)
   td_ob_frame.pack(anchor='w', pady=1)
   tk.Label(root, text="* Cannot be selected along with other choices", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=30)
@@ -137,6 +144,7 @@ def main():
       return
     
     root.withdraw()
+    show_toast("Processing...", 3000, "top-right", "info")
     
     try:
       global camera_running 
@@ -162,11 +170,12 @@ def main():
           td()
         if td_ob_bool.get():
           minutes_value = minutes_var.get()
-          td_ob(minutes_value)
+          seconds_value = seconds_var.get()
+          td_ob(minutes_value, seconds_value)
           td_ob_bool.set(False)
           td_nw.set(True)
     except Exception as e:
-      pymsgbox.alert(text='Script successfully stopped', title='Alert', button='Ok')
+      show_toast("Script successfully stopped", 5000, "top-right", "success")
       print(f"An error occurred: {e}")
     finally:
       root.deiconify() 
