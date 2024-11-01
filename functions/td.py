@@ -2,6 +2,7 @@ import pyautogui
 import time
 import os
 import sys
+from utils.toast import show_toast
 
 pyautogui.FAILSAFE = True
 
@@ -15,6 +16,8 @@ image_path = resource_path('images/not_working_final.png')
 image_path_2 = resource_path('images/not_working_final_2.png')
 
 def td():
+  show_toast("Auto Yes Bypass enabled!", 2000, "top-right", "warning")
+  
   while True:
     try:
       location1, location2 = None, None
@@ -40,6 +43,7 @@ def td():
 
     time.sleep(1)
 
+  show_toast("I got you!", 2000, "top-right", "info")
   pyautogui.press('esc')
   time.sleep(1)
   pyautogui.press('esc')
