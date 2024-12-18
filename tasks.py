@@ -9,6 +9,7 @@ def build(c):
     '--add-data "images/not_working_final_2.png;images" '
     '--add-data "images/start_working_again.png;images" '
     '--add-data "images/start_working_again_2.png;images" '
+    '--add-data "images/gear.png;images" '
     'main_app.py'
   )
   
