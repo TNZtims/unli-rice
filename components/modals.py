@@ -79,6 +79,7 @@ def show_vs_code_input(root, code_content):
 def open_settings(root):
   documents_folder = os.path.join(os.path.expanduser("~"), "Documents", "_Unli Rice_")
   configs_path = os.path.join(documents_folder, "configs.json")
+  configs_path = os.getenv("UNLI_RICE_CONFIG_PATH", configs_path)
   
   def load_default_contents():
     with open(configs_path, "r") as file:
