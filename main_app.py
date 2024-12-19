@@ -52,7 +52,7 @@ dynamic_geometry = calculate_dynamic_geometry(base_width, base_height, base_res,
 def main():
   global report_content, code_content, label_to_use
   root = tk.Tk()
-  root.title("IT Department Tool Automations")
+  root.title(titles["hidden"])
   root.geometry(dynamic_geometry)
   root.resizable(False, False)
   root.attributes("-alpha", 0.6)
