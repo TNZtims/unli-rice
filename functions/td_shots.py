@@ -23,11 +23,12 @@ def td_shots(virtual_camera_running):
     image = cv2.imread(custom_image_path)
     image = cv2.resize(image, (1280, 720))
     print(f'Displaying image: {image_file}')
+    show_toast(f'Displaying image: {image_file}', 3000, "top-right", "success")
     return image
 
   with pyvirtualcam.Camera(width=1280, height=720, fps=30) as cam:
     print(f'Virtual camera started: {cam.device}')
-    show_toast(f'Virtual camera started: {cam.device}', 3000, "top-right", "success")
+    show_toast(f'Virtual camera started: {cam.device}', 3000, "top-right", "info")
 
     current_index = 0 
 
