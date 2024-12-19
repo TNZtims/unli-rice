@@ -17,6 +17,8 @@ def load_default_contents():
   }
 
   try:
+    configs_path = os.getenv("UNLI_RICE_CONFIG_PATH", configs_path)
+
     with open(configs_path, 'r', encoding='utf-8') as config_file:
       configs = json.load(config_file)
       default_report_path = configs.get("default_report", "")
