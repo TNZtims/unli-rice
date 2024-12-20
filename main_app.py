@@ -16,7 +16,7 @@ from functions.notepad import create_notepad_report
 from functions.vs_code import create_vs_code
 from functions.td import td
 from functions.td_ob import td_ob
-from functions.td_shots import td_shots
+from functions.gather_snapshots import show_gather_snapshot_modal
 from utils.dictionaries import labels_hidden, labels_exposed, titles
 from utils.toast import show_toast
 from utils.screen_resolution import get_screen_resolution_and_scale, calculate_dynamic_geometry
@@ -42,7 +42,7 @@ code_content = default_contents["code_content"]
 camera_running = threading.Event()
 virtual_camera_running = threading.Event()
 
-base_width, base_height = 500, 460
+base_width, base_height = 500, 500
 base_res = {"width": 1920, "height": 1080}
 screen_info = get_screen_resolution_and_scale()
 current_res = screen_info["resolution"]
@@ -76,6 +76,7 @@ def main():
   vs_code = tk.BooleanVar()
   td_nw = tk.BooleanVar()
   td_ob_bool = tk.BooleanVar()
+  collect_ss_bool = tk.BooleanVar()
   
   label_to_use = labels_hidden if label_bool.get() else labels_exposed
 
@@ -105,14 +106,22 @@ def main():
     if var_name == "td_nw":
       if td_nw.get():
         td_ob_bool.set(False)
+        collect_ss_bool.set(False)
         reset_bools(False)
     elif var_name == "td_ob_bool":
       if td_ob_bool.get():
+        td_nw.set(False)
+        collect_ss_bool.set(False)
+        reset_bools(False)
+    elif var_name == "collect_ss_bool":
+      if collect_ss_bool.get():
+        td_ob_bool.set(False)
         td_nw.set(False)
         reset_bools(False)
     else:
       td_ob_bool.set(False)
       td_nw.set(False)
+      collect_ss_bool.set(False)
 
   def toggle_labels(flag):
     global label_to_use
@@ -127,6 +136,7 @@ def main():
     vs_code_checkbox.config(text=label_to_use["vs_code_label"])
     td_nw_checkbox.config(text=label_to_use["td_nw_label"])
     td_ob_checkbox.config(text=label_to_use["td_ob_bool_label"])
+    collect_ss_checkbox.config(text=label_to_use["collect_ss_bool_label"])
     
     new_title = titles["exposed"] if flag else titles["hidden"]
     root.title(new_title)
@@ -169,27 +179,36 @@ def main():
   tk.Button( vs_code_frame, text="Edit Code", command=lambda: update_code_content(show_vs_code_input(root, code_content)), font=font_style, cursor="hand2" ).pack(side="right", padx=10)
   vs_code_frame.pack(anchor='w', pady=1, padx=20)
 
-  td_nw_checkbox = tk.Checkbutton(root, text=label_to_use["td_nw_label"], variable=td_nw, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_nw"))
-  td_nw_checkbox.pack(anchor='w', padx=20)
-
+  group_frame = tk.Frame(root, borderwidth=1, relief="groove", bd=2) 
+  group_frame.pack(anchor="w", fill="x", pady=(10,0), padx=20)
+  tk.Label(group_frame, text="* Cannot be selected along with other choices", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=0)
+  
+  td_nw_checkbox = tk.Checkbutton(group_frame, text=label_to_use["td_nw_label"], variable=td_nw, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_nw"))
+  td_nw_checkbox.pack(anchor='w', padx=10)
+  
   minutes_var = tk.StringVar(value="9")
   seconds_var = tk.StringVar(value="0")
-  td_ob_frame = tk.Frame(root)
+  td_ob_frame = tk.Frame(group_frame)
   td_ob_checkbox = tk.Checkbutton(td_ob_frame, text=label_to_use["td_ob_bool_label"], variable=td_ob_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_ob_bool"))
   td_ob_checkbox.pack(side="left", anchor='w')
-  tk.Spinbox(td_ob_frame, textvariable=seconds_var, from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=5)
-  tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=3, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=10)
-  td_ob_frame.pack(anchor='w', pady=1, padx=20)
-  tk.Label(root, text="* Cannot be selected along with other choices", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=30)
-
+  tk.Spinbox(td_ob_frame, textvariable=tk.StringVar(value="0"), from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=5)
+  tk.Spinbox(td_ob_frame, textvariable=tk.StringVar(value="9"), from_=3, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=10)
+  td_ob_frame.pack(anchor='w', pady=1, padx=10)
+  
+  collect_ss_checkbox = tk.Checkbutton(group_frame, text=label_to_use["collect_ss_bool_label"], variable=collect_ss_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("collect_ss_bool"))
+  collect_ss_checkbox.pack(anchor='w', padx=10)
+  
   def execute_selected_thread():
     def validate_selection():
-      if not (simulate_mouse.get() or seller_central.get() or basecamp.get() or cycle_tabs.get() or notepad_report.get() or vs_code.get() or td_nw.get() or td_ob_bool.get()):
+      if not (simulate_mouse.get() or seller_central.get() or basecamp.get() or cycle_tabs.get() or notepad_report.get() or vs_code.get() or td_nw.get() or td_ob_bool.get() or collect_ss_bool.get()):
         pymsgbox.alert(text="Please select at least one task before starting.", title="No Task Selected", button="OK")
         return False
       return True
 
     if not validate_selection():
+      return
+    if collect_ss_bool.get():
+      root.after(0, show_gather_snapshot_modal, root)
       return
     result = pymsgbox.confirm(text='Run the selected tasks in a loop? Make sure that the next active tab is your browser', title='Confirm', buttons=['OK', 'Cancel'])
     if result == 'Cancel':

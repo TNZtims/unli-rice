@@ -7,6 +7,7 @@ labels_hidden = {
   "vs_code_label": "Develop Automation",
   "td_nw_label": "Amazon Auto Show More",
   "td_ob_bool_label": "Set Project Deadline",
+  "collect_ss_bool_label": "Collect Amazon Detail Page Images",
 }
 
 labels_exposed = {
@@ -18,6 +19,7 @@ labels_exposed = {
   "vs_code_label": "Code Javascript in VS Code",
   "td_nw_label": "Auto Yes Bypass",
   "td_ob_bool_label": "OB Bypass (Minutes, Seconds)",
+  "collect_ss_bool_label": "Gather Snapshots",
 }
 
 titles = {
