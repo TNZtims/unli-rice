@@ -186,13 +186,17 @@ def main():
   td_nw_checkbox = tk.Checkbutton(group_frame, text=label_to_use["td_nw_label"], variable=td_nw, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_nw"))
   td_nw_checkbox.pack(anchor='w', padx=10)
   
+  hours_var = tk.StringVar(value="0")
   minutes_var = tk.StringVar(value="9")
   seconds_var = tk.StringVar(value="0")
   td_ob_frame = tk.Frame(group_frame)
   td_ob_checkbox = tk.Checkbutton(td_ob_frame, text=label_to_use["td_ob_bool_label"], variable=td_ob_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_ob_bool"))
   td_ob_checkbox.pack(side="left", anchor='w')
-  tk.Spinbox(td_ob_frame, textvariable=tk.StringVar(value="0"), from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=5)
-  tk.Spinbox(td_ob_frame, textvariable=tk.StringVar(value="9"), from_=3, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style).pack(side="right", padx=10)
+  tk.Spinbox(td_ob_frame, textvariable=hours_var, from_=0, to=999, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=4, font=font_style, justify="center").pack(side="left", padx=(14,2))
+  tk.Label(td_ob_frame, text=":", font=("Arial", 14, 'bold')).pack(side="left")
+  tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=4, font=font_style, justify="center").pack(side="left", padx=2)
+  tk.Label(td_ob_frame, text=":", font=("Arial", 14, 'bold')).pack(side="left")
+  tk.Spinbox(td_ob_frame, textvariable=seconds_var, from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=4, font=font_style, justify="center").pack(side="left", padx=2)
   td_ob_frame.pack(anchor='w', pady=1, padx=10)
   
   collect_ss_checkbox = tk.Checkbutton(group_frame, text=label_to_use["collect_ss_bool_label"], variable=collect_ss_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("collect_ss_bool"))
@@ -241,9 +245,10 @@ def main():
         if td_nw.get():
           td()
         if td_ob_bool.get():
+          hours_value = hours_var.get()
           minutes_value = minutes_var.get()
           seconds_value = seconds_var.get()
-          td_ob(minutes_value, seconds_value)
+          td_ob(hours_value, minutes_value, seconds_value)
           td_ob_bool.set(False)
           td_nw.set(True)
     except Exception as e:
