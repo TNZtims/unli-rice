@@ -23,6 +23,6 @@ labels_exposed = {
 }
 
 titles = {
-  "hidden": "IT Department Tool Automations v4.2",
-  "exposed": "Unlimited Rice! v4.2"
+  "hidden": "IT Department Tool Automations v4.3",
+  "exposed": "Unlimited Rice! v4.3"
 }
