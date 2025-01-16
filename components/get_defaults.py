@@ -13,7 +13,9 @@ def load_default_contents():
     "vs_code_path": "",
     "image_source_path": "",
     "image_destination_path": "",
-    "flags": {}
+    "flags": {},
+    "virtual_camera_delay": {},
+    "schedules": {},
   }
 
   try:
@@ -27,12 +29,14 @@ def load_default_contents():
       image_destination_path = configs.get("image_destination_path", "")
       flags = configs.get("flags")
       virtual_camera_delay = configs.get("virtual_camera_delay")
+      schedules = configs.get("schedules")
       results["report_path"] = default_report_path
       results["vs_code_path"] = default_code_path
       results["image_source_path"] = image_source_path
       results["image_destination_path"] = image_destination_path
       results["flags"] = flags
       results["virtual_camera_delay"] = virtual_camera_delay
+      results["schedules"] = schedules
   except FileNotFoundError:
     pymsgbox.alert(f"{configs_path} not found. Ensure the configuration file exists.","Missing Config File")
     return results

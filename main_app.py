@@ -8,6 +8,7 @@ import win32event
 import win32api
 import winerror
 import tkinter as tk
+from tkinter import ttk
 from PIL import Image, ImageTk
 from functions.mouse_keyboard import simulate_mouse_movements, cycle_through_tabs
 from functions.seller_central import go_to_seller_central_pricing_health
@@ -17,6 +18,7 @@ from functions.vs_code import create_vs_code
 from functions.td import td
 from functions.td_ob import td_ob
 from functions.gather_snapshots import show_gather_snapshot_modal
+from functions.td_scheduled import td_scheduled
 from utils.dictionaries import labels_hidden, labels_exposed, titles
 from utils.toast import show_toast
 from utils.screen_resolution import get_screen_resolution_and_scale, calculate_dynamic_geometry
@@ -39,23 +41,32 @@ if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
 default_contents = load_default_contents()
 report_content = default_contents["report_content"]
 code_content = default_contents["code_content"]
+schedules = default_contents["schedules"]
+options = list(schedules.keys())
+
 camera_running = threading.Event()
 virtual_camera_running = threading.Event()
 
-base_width, base_height = 500, 500
+base_width, base_height = 500, 570
 base_res = {"width": 1920, "height": 1080}
 screen_info = get_screen_resolution_and_scale()
 current_res = screen_info["resolution"]
 scale = screen_info["scale"]
-dynamic_geometry = calculate_dynamic_geometry(base_width, base_height, base_res, current_res, scale)
+window_width, window_height = calculate_dynamic_geometry(base_width, base_height, base_res, current_res, scale)
 
 def main():
   global report_content, code_content, label_to_use
   root = tk.Tk()
   root.title(titles["hidden"])
-  root.geometry(dynamic_geometry)
   root.resizable(False, False)
   root.attributes("-alpha", 0.6)
+  
+  screen_width = root.winfo_screenwidth()
+  screen_height = root.winfo_screenheight()
+  position_x = (screen_width - window_width) // 2
+  position_y = (screen_height - window_height) // 2
+  
+  root.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
   
   if hasattr(sys, "_MEIPASS"):
     icon_path = os.path.join(sys._MEIPASS, "images", "unli_rice.ico")
@@ -77,6 +88,7 @@ def main():
   td_nw = tk.BooleanVar()
   td_ob_bool = tk.BooleanVar()
   collect_ss_bool = tk.BooleanVar()
+  scheduled_td_bool = tk.BooleanVar()
   
   label_to_use = labels_hidden if label_bool.get() else labels_exposed
 
@@ -107,21 +119,31 @@ def main():
       if td_nw.get():
         td_ob_bool.set(False)
         collect_ss_bool.set(False)
+        scheduled_td_bool.set(False)
         reset_bools(False)
     elif var_name == "td_ob_bool":
       if td_ob_bool.get():
         td_nw.set(False)
         collect_ss_bool.set(False)
+        scheduled_td_bool.set(False)
         reset_bools(False)
     elif var_name == "collect_ss_bool":
       if collect_ss_bool.get():
         td_ob_bool.set(False)
         td_nw.set(False)
+        scheduled_td_bool.set(False)
+        reset_bools(False)
+    elif var_name == "scheduled_td_bool":
+      if scheduled_td_bool.get():
+        td_ob_bool.set(False)
+        td_nw.set(False)
+        collect_ss_bool.set(False)
         reset_bools(False)
     else:
       td_ob_bool.set(False)
       td_nw.set(False)
       collect_ss_bool.set(False)
+      scheduled_td_bool.set(False)
 
   def toggle_labels(flag):
     global label_to_use
@@ -137,6 +159,7 @@ def main():
     td_nw_checkbox.config(text=label_to_use["td_nw_label"])
     td_ob_checkbox.config(text=label_to_use["td_ob_bool_label"])
     collect_ss_checkbox.config(text=label_to_use["collect_ss_bool_label"])
+    scheduled_td_checkbox.config(text=label_to_use["scheduled_td_label"])
     
     new_title = titles["exposed"] if flag else titles["hidden"]
     root.title(new_title)
@@ -183,8 +206,13 @@ def main():
   group_frame.pack(anchor="w", fill="x", pady=(10,0), padx=20)
   tk.Label(group_frame, text="* Cannot be selected along with other choices", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=0)
   
-  td_nw_checkbox = tk.Checkbutton(group_frame, text=label_to_use["td_nw_label"], variable=td_nw, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_nw"))
-  td_nw_checkbox.pack(anchor='w', padx=10)
+  td_nw_frame = tk.Frame(group_frame)
+  td_nw_checkbox = tk.Checkbutton(td_nw_frame, text=label_to_use["td_nw_label"], variable=td_nw, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("td_nw"))
+  td_nw_checkbox.pack(side='left', anchor='w', padx=10)
+  td_nw_dropdown = ttk.Combobox(td_nw_frame, values=['Wait', 'Do not wait'], state="readonly", font=font_style, justify="center", cursor="hand2", width=10)
+  td_nw_dropdown.pack(side='left', padx=10)
+  td_nw_frame.pack(anchor='w')
+  td_nw_dropdown.set("Wait")
   
   hours_var = tk.StringVar(value="0")
   minutes_var = tk.StringVar(value="9")
@@ -202,9 +230,22 @@ def main():
   collect_ss_checkbox = tk.Checkbutton(group_frame, text=label_to_use["collect_ss_bool_label"], variable=collect_ss_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("collect_ss_bool"))
   collect_ss_checkbox.pack(anchor='w', padx=10)
   
+  schedule_frame = tk.Frame(group_frame)
+  scheduled_td_checkbox = tk.Checkbutton(schedule_frame, text=label_to_use["scheduled_td_label"], variable=scheduled_td_bool, font=font_style, cursor="hand2", command=lambda: toggle_checkboxes("scheduled_td_bool"))
+  scheduled_td_checkbox.pack(side='left', anchor='w', padx=10)
+  schedule_dropdown = ttk.Combobox(schedule_frame, values=options, state="readonly", font=font_style, justify="center", cursor="hand2")
+  schedule_dropdown.pack(side='left', padx=10)
+  schedule_dropdown.set("Select an option")
+  
+  if options: 
+    schedule_dropdown.set(options[0])
+  schedule_frame.pack(anchor='w')
+  
+  tk.Label(group_frame, text="* Ensure keyboard shortcut is enabled", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=30)
+
   def execute_selected_thread():
     def validate_selection():
-      if not (simulate_mouse.get() or seller_central.get() or basecamp.get() or cycle_tabs.get() or notepad_report.get() or vs_code.get() or td_nw.get() or td_ob_bool.get() or collect_ss_bool.get()):
+      if not (simulate_mouse.get() or seller_central.get() or basecamp.get() or cycle_tabs.get() or notepad_report.get() or vs_code.get() or td_nw.get() or td_ob_bool.get() or collect_ss_bool.get() or scheduled_td_bool.get()):
         pymsgbox.alert(text="Please select at least one task before starting.", title="No Task Selected", button="OK")
         return False
       return True
@@ -243,7 +284,7 @@ def main():
         if vs_code.get():
           create_vs_code(code_content)
         if td_nw.get():
-          td()
+          td(td_nw_dropdown.get())
         if td_ob_bool.get():
           hours_value = hours_var.get()
           minutes_value = minutes_var.get()
@@ -251,6 +292,10 @@ def main():
           td_ob(hours_value, minutes_value, seconds_value)
           td_ob_bool.set(False)
           td_nw.set(True)
+        if scheduled_td_bool.get():
+          selected_schedule = schedule_dropdown.get()
+          td_scheduled(selected_schedule, schedules[selected_schedule])
+          break
     except Exception as e:
       show_toast("Script successfully stopped", 5000, "top-right", "success")
       print(f"An error occurred: {e}")

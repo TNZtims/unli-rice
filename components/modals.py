@@ -5,6 +5,7 @@ import tkinter as tk
 import json
 from tkinter import Text, filedialog
 from .get_defaults import load_default_contents
+from .schedule_settings import open_schedule_settings
 
 def show_report_input(root, report_content):
   report_window = tk.Toplevel(root)
@@ -108,6 +109,10 @@ def open_settings(root):
     updated_contents["flags"]["enable_startup_snapshot"] = snapshot_bool.get()
     updated_contents["virtual_camera_delay"]["minutes"] = minutes_var.get()
     updated_contents["virtual_camera_delay"]["seconds"] = seconds_var.get()
+    
+    for key, new_value in updated_schedules.items():
+      updated_contents["schedules"][key] = new_value
+    
     save_default_contents(updated_contents)
     show_parent_window(settings_window)
     
@@ -121,8 +126,15 @@ def open_settings(root):
     state = "normal" if virtual_cam_bool.get() else "disabled"
     minutes_spinbox.config(state=state)
     seconds_spinbox.config(state=state)
+    
+  def handle_button_schedule_click(key, value):
+    def on_updated(new_value):
+      updated_schedules[key] = new_value
+    open_schedule_settings(settings_window, key, value, on_updated)
 
   root.withdraw()
+  
+  updated_schedules = {}
 
   default_contents = load_default_contents()
   image_source_path = default_contents["image_source_path"]
@@ -130,6 +142,7 @@ def open_settings(root):
   minutes_default = default_contents["virtual_camera_delay"]["minutes"]
   seconds_default = default_contents["virtual_camera_delay"]["seconds"]
   flags = default_contents["flags"]
+  schedules = default_contents["schedules"]
 
   settings_window = tk.Toplevel(root)
   settings_window.title("Configurations")
@@ -151,21 +164,21 @@ def open_settings(root):
   snapshot_bool = tk.BooleanVar(value=flags["enable_startup_snapshot"])
 
   camera_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
-  camera_settings_frame.pack(padx=20, pady=(20, 10), fill='x')
+  camera_settings_frame.pack(padx=10, pady=(10,5), fill='x')
   camera_settings_label = tk.Label(camera_settings_frame, text="Camera", font=("Arial", 12, 'bold'), anchor="w")
   camera_settings_label.pack(padx=10, pady=5)
 
   always_on_cam_frame = tk.Frame(camera_settings_frame)
   tk.Checkbutton(always_on_cam_frame, text="Always On", variable=always_on_cam_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
-  always_on_cam_frame.pack(anchor='w', pady=1)
+  always_on_cam_frame.pack(anchor='w')
   
   enable_snapshot_frame = tk.Frame(camera_settings_frame)
   tk.Checkbutton(enable_snapshot_frame, text="Enable Snapshot at Start of Execution", variable=snapshot_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
-  enable_snapshot_frame.pack(anchor='w', pady=1)
+  enable_snapshot_frame.pack(anchor='w')
 
   virtual_cam_frame = tk.Frame(camera_settings_frame)
   tk.Checkbutton(virtual_cam_frame, text="Enable Virtual Camera", variable=virtual_cam_bool, font=font_style, cursor="hand2", command=toggle_spinbox_state).pack(side="left", anchor='w')
-  virtual_cam_frame.pack(anchor='w', pady=1)
+  virtual_cam_frame.pack(anchor='w')
   
   minutes_var = tk.StringVar(value=minutes_default)
   seconds_var = tk.StringVar(value=seconds_default)
@@ -174,11 +187,11 @@ def open_settings(root):
   seconds_spinbox.pack(side="right", padx=5)
   minutes_spinbox = tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=0, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style)
   minutes_spinbox.pack(side="right", padx=10)
-  td_ob_frame.pack(anchor='w', pady=1, padx=20)
-  tk.Label(camera_settings_frame, text="* Image switching delay in minutes and seconds", font=("Arial", 8), fg="red").pack(anchor="w", pady=0, padx=30)
+  td_ob_frame.pack(anchor='w', padx=20)
+  tk.Label(camera_settings_frame, text="* Image switching delay in minutes and seconds", font=("Arial", 8), fg="red").pack(anchor="w", padx=30)
 
   locations_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
-  locations_settings_frame.pack(padx=20, pady=10, fill='x')
+  locations_settings_frame.pack(padx=10, pady=(5,5), fill='x')
   locations_settings_label = tk.Label(locations_settings_frame, text="Source/Destination Locations", font=("Arial", 12, 'bold'))
   locations_settings_label.pack(padx=10, pady=5)
 
@@ -198,6 +211,15 @@ def open_settings(root):
   destination_button.pack(side="left", padx=5)
   destination_label = tk.Label(destination_frame, textvariable=destination_folder, font=font_style, anchor="w")
   destination_label.pack(side="left", padx=5)
+  
+  schedules_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
+  schedules_settings_frame.pack(padx=10, pady=(5,5), fill='x')
+  camera_settings_label = tk.Label(schedules_settings_frame, text="Schedules", font=("Arial", 12, 'bold'), anchor="w")
+  camera_settings_label.pack(padx=10, pady=5)
+
+  for key, value in schedules.items():
+    button = tk.Button(schedules_settings_frame, text=key, font=font_style, cursor="hand2", command=lambda k=key, v=value: handle_button_schedule_click(k, v))
+    button.pack(padx=20, pady=(0,5), fill='x')
 
   bottom_frame = tk.Frame(settings_window)
   bottom_frame.place(relx=0.5, rely=1.0, anchor="s")
