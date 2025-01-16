@@ -26,7 +26,7 @@ def calculate_dynamic_geometry(base_width, base_height, base_res, current_res, s
   final_width = int(base_width * width_scale * scale)
   final_height = int(base_height * height_scale * scale)
   
-  return f"{final_width}x{final_height}"
+  return final_width, final_height
 
 # screen_info = get_screen_resolution_and_scale()
 # print(f"Screen resolution: {screen_info['resolution']['width']}x{screen_info['resolution']['height']}")
