@@ -8,6 +8,7 @@ labels_hidden = {
   "td_nw_label": "Amazon Auto Show More",
   "td_ob_bool_label": "Set Project Deadline",
   "collect_ss_bool_label": "Collect Amazon Detail Page Images",
+  "scheduled_td_label": "Scheduled Maintenance",
 }
 
 labels_exposed = {
@@ -18,11 +19,12 @@ labels_exposed = {
   "notepad_report_label": "Create Notepad Report",
   "vs_code_label": "Code Javascript in VS Code",
   "td_nw_label": "Auto Yes Bypass",
-  "td_ob_bool_label": "OB Bypass (Minutes, Seconds)",
+  "td_ob_bool_label": "OB Bypass (hour/min/sec)",
   "collect_ss_bool_label": "Gather Snapshots",
+  "scheduled_td_label": "Scheduled TD",
 }
 
 titles = {
-  "hidden": "IT Department Tool Automations v4.3",
-  "exposed": "Unlimited Rice! v4.3"
+  "hidden": "IT Department Tool Automations v5.0",
+  "exposed": "Unlimited Rice! v5.0"
 }
