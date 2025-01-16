@@ -16,9 +16,16 @@ not_working_image_path_100 = resource_path('images/not_working_final.png')
 not_working_image_path_150 = resource_path('images/not_working_final_2.png')
 not_working_image_path_125 = resource_path('images/not_working_final_3.png')
 
-def td():
+def td(to_wait):
   show_toast("Auto Yes Bypass enabled!", 2000, "top-right", "warning")
+  if to_wait == 'Wait':
+    td_wait()
+  else:
+    td_no_wait()
+    
+  time.sleep(1)
   
+def td_wait():
   while True:
     try:
       location1, location2, location3 = None, None, None
@@ -56,3 +63,16 @@ def td():
   time.sleep(1)
   pyautogui.hotkey('win', 'down')
   time.sleep(1)
+  
+def td_no_wait():
+  press_interval = 2
+  last_press_time = time.time()
+
+  while True:
+    pyautogui.position()  
+
+    if time.time() - last_press_time >= press_interval:
+      pyautogui.press('esc')
+      last_press_time = time.time()
+
+    time.sleep(1) 
