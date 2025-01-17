@@ -4,4 +4,5 @@ dist/
 
 main_app.spec
 test.py
+test.spec
 .env
