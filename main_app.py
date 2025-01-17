@@ -261,6 +261,9 @@ def main():
     
     root.withdraw()
     show_toast("Processing...", 3000, "top-right", "info")
+    print('Reloaded configs')
+    default_contents = load_default_contents()
+    schedules = default_contents["schedules"]
 
     try:
       global camera_running, virtual_camera_running
@@ -294,8 +297,15 @@ def main():
           td_nw.set(True)
         if scheduled_td_bool.get():
           selected_schedule = schedule_dropdown.get()
-          td_scheduled(selected_schedule, schedules[selected_schedule])
-          break
+          last_toggle = td_scheduled(selected_schedule, schedules[selected_schedule])
+          print(last_toggle)
+          
+          if last_toggle:
+            scheduled_td_bool.set(False)
+            td_nw.set(True)
+          else:
+            break
+          
     except Exception as e:
       show_toast("Script successfully stopped", 5000, "top-right", "success")
       print(f"An error occurred: {e}")
