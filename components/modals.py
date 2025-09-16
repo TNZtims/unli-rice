@@ -7,11 +7,50 @@ from tkinter import Text, filedialog
 from .get_defaults import load_default_contents
 from .schedule_settings import open_schedule_settings
 
+# Modern dark theme colors (matching main_app.py)
+DARK_BG = "#1a1a1a"          # Dark background
+SURFACE_BG = "#2d2d2d"        # Elevated surface
+ACCENT_BG = "#3d3d3d"         # Interactive elements
+PRIMARY_COLOR = "#00d4ff"     # Tech blue accent
+SECONDARY_COLOR = "#ff6b35"   # Orange accent
+TEXT_PRIMARY = "#ffffff"      # White text
+TEXT_SECONDARY = "#b0b0b0"    # Gray text
+SUCCESS_COLOR = "#00ff88"     # Success green
+WARNING_COLOR = "#ffaa00"     # Warning orange
+ERROR_COLOR = "#ff4757"       # Error red
+
+# Modern typography (matching main_app.py)
+title_font = ("Segoe UI", 16, "bold")
+header_font = ("Segoe UI", 14, "bold")
+body_font = ("Segoe UI", 11)
+small_font = ("Segoe UI", 9)
+x_small_font = ("Segoe UI", 7)
+button_font = ("Segoe UI", 12, "bold")
+
 def show_report_input(root, report_content):
   report_window = tk.Toplevel(root)
   report_window.attributes("-fullscreen", True)
-  report_window.title("Edit Report")
-  report_text = Text(report_window, wrap='word')
+  report_window.title("📝 Edit Report")
+  report_window.configure(bg=DARK_BG)
+  
+  # Header section
+  header_frame = tk.Frame(report_window, bg=SURFACE_BG, height=60)
+  header_frame.pack(fill="x", pady=(0, 20))
+  header_frame.pack_propagate(False)
+  
+  title_label = tk.Label(header_frame, text="📝 Report Content Editor", 
+                        font=title_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  title_label.place(relx=0.5, rely=0.5, anchor="center")
+  
+  # Text editor with modern styling
+  text_frame = tk.Frame(report_window, bg=DARK_BG)
+  text_frame.pack(fill='both', expand=True, padx=20, pady=(0, 20))
+  
+  report_text = Text(text_frame, wrap='word', font=body_font,
+                    bg=ACCENT_BG, fg=TEXT_PRIMARY, 
+                    insertbackground=PRIMARY_COLOR,
+                    selectbackground=PRIMARY_COLOR, selectforeground=DARK_BG,
+                    relief="flat", bd=0, padx=15, pady=15)
   report_text.insert(tk.END, report_content) 
   report_text.pack(fill='both', expand=True)
   updated_content = {"value": report_content}
@@ -37,16 +76,48 @@ def show_report_input(root, report_content):
     report_window.destroy() 
     return
 
-  tk.Button( report_window, text="Save", command=save_report, cursor="hand2", font=('Arial', 12), bg="green", fg="white" ).pack(padx=20, pady=(25,0), fill='x')
-  tk.Button( report_window, text="Cancel", command=cancel_changes, cursor="hand2", font=('Arial', 12), bg="red", fg="white" ).pack(padx=20, pady=(0,25), fill='x')
+  # Bottom buttons with modern styling
+  buttons_frame = tk.Frame(report_window, bg=DARK_BG)
+  buttons_frame.pack(fill="x", side="bottom", padx=20, pady=20)
+  
+  save_button = tk.Button(buttons_frame, text="💾 Save Changes", command=save_report, 
+                         cursor="hand2", font=button_font, 
+                         bg=SUCCESS_COLOR, fg=DARK_BG, relief="flat", borderwidth=0, 
+                         pady=12, activebackground="#00cc77", activeforeground=DARK_BG)
+  save_button.pack(side="left", fill='x', expand=True, padx=(0, 10))
+  
+  cancel_button = tk.Button(buttons_frame, text="❌ Cancel", command=cancel_changes, 
+                           cursor="hand2", font=button_font,
+                           bg=ERROR_COLOR, fg=TEXT_PRIMARY, relief="flat", borderwidth=0, 
+                           pady=12, activebackground="#ff6b7a", activeforeground=TEXT_PRIMARY)
+  cancel_button.pack(side="right", fill='x', expand=True, padx=(10, 0))
   report_window.wait_window()
   return updated_content["value"]
 
 def show_vs_code_input(root, code_content):
   vs_code_window = tk.Toplevel(root)
   vs_code_window.attributes("-fullscreen", True)
-  vs_code_window.title("Edit Code")
-  vs_code_text = Text(vs_code_window, wrap='word')
+  vs_code_window.title("💻 Edit Code")
+  vs_code_window.configure(bg=DARK_BG)
+  
+  # Header section
+  header_frame = tk.Frame(vs_code_window, bg=SURFACE_BG, height=60)
+  header_frame.pack(fill="x", pady=(0, 20))
+  header_frame.pack_propagate(False)
+  
+  title_label = tk.Label(header_frame, text="💻 Code Content Editor", 
+                        font=title_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  title_label.place(relx=0.5, rely=0.5, anchor="center")
+  
+  # Text editor with modern styling
+  text_frame = tk.Frame(vs_code_window, bg=DARK_BG)
+  text_frame.pack(fill='both', expand=True, padx=20, pady=(0, 20))
+  
+  vs_code_text = Text(text_frame, wrap='word', font=("Consolas", 11),
+                     bg=ACCENT_BG, fg=TEXT_PRIMARY, 
+                     insertbackground=PRIMARY_COLOR,
+                     selectbackground=PRIMARY_COLOR, selectforeground=DARK_BG,
+                     relief="flat", bd=0, padx=15, pady=15)
   vs_code_text.insert(tk.END, code_content) 
   vs_code_text.pack(fill='both', expand=True)
   updated_content = {"value": code_content}
@@ -72,8 +143,21 @@ def show_vs_code_input(root, code_content):
     vs_code_window.destroy() 
     return
 
-  tk.Button( vs_code_window, text="Save", command=save_vs_code, cursor="hand2", font=('Arial', 12), bg="green", fg="white" ).pack(padx=20, pady=(25,0), fill='x')
-  tk.Button( vs_code_window, text="Cancel", command=cancel_changes, cursor="hand2", font=('Arial', 12), bg="red", fg="white" ).pack(padx=20, pady=(0,25), fill='x')
+  # Bottom buttons with modern styling
+  buttons_frame = tk.Frame(vs_code_window, bg=DARK_BG)
+  buttons_frame.pack(fill="x", side="bottom", padx=20, pady=20)
+  
+  save_button = tk.Button(buttons_frame, text="💾 Save Changes", command=save_vs_code, 
+                         cursor="hand2", font=button_font, 
+                         bg=SUCCESS_COLOR, fg=DARK_BG, relief="flat", borderwidth=0, 
+                         pady=12, activebackground="#00cc77", activeforeground=DARK_BG)
+  save_button.pack(side="left", fill='x', expand=True, padx=(0, 10))
+  
+  cancel_button = tk.Button(buttons_frame, text="❌ Cancel", command=cancel_changes, 
+                           cursor="hand2", font=button_font,
+                           bg=ERROR_COLOR, fg=TEXT_PRIMARY, relief="flat", borderwidth=0, 
+                           pady=12, activebackground="#ff6b7a", activeforeground=TEXT_PRIMARY)
+  cancel_button.pack(side="right", fill='x', expand=True, padx=(10, 0))
   vs_code_window.wait_window()
   return updated_content["value"]
 
@@ -145,10 +229,11 @@ def open_settings(root):
   schedules = default_contents["schedules"]
 
   settings_window = tk.Toplevel(root)
-  settings_window.title("Configurations")
-  settings_window.attributes("-alpha", 0.6)
+  settings_window.title("⚙️ Configurations")
+  settings_window.attributes("-alpha", 0.95)
   settings_window.resizable(False, False)
   settings_window.focus_force()
+  settings_window.configure(bg=DARK_BG)
 
   root_x = root.winfo_x()
   root_y = root.winfo_y()
@@ -158,72 +243,166 @@ def open_settings(root):
   settings_window.geometry(f"{root_width}x{root_height}+{root_x}+{root_y}")
   settings_window.protocol("WM_DELETE_WINDOW", lambda: show_parent_window(settings_window))
 
-  font_style = ("Arial", 12)
+  # Header section
+  header_frame = tk.Frame(settings_window, bg=SURFACE_BG, height=60)
+  header_frame.pack(fill="x", pady=(0, 20))
+  header_frame.pack_propagate(False)
+  
+  title_label = tk.Label(header_frame, text="⚙️ System Configurations", 
+                        font=title_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  title_label.place(relx=0.5, rely=0.5, anchor="center")
+
+  font_style = body_font
   always_on_cam_bool = tk.BooleanVar(value=flags["camera_always_on"])
   virtual_cam_bool = tk.BooleanVar(value=flags["enable_virtual_camera"])
   snapshot_bool = tk.BooleanVar(value=flags["enable_startup_snapshot"])
 
-  camera_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
-  camera_settings_frame.pack(padx=10, pady=(10,5), fill='x')
-  camera_settings_label = tk.Label(camera_settings_frame, text="Camera", font=("Arial", 12, 'bold'), anchor="w")
-  camera_settings_label.pack(padx=10, pady=5)
-
-  always_on_cam_frame = tk.Frame(camera_settings_frame)
-  tk.Checkbutton(always_on_cam_frame, text="Always On", variable=always_on_cam_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
-  always_on_cam_frame.pack(anchor='w')
+  # Camera settings section with modern card design
+  camera_settings_frame = tk.Frame(settings_window, bg=SURFACE_BG, relief="flat", bd=0)
+  camera_settings_frame.pack(padx=20, pady=(0, 15), fill='x')
   
-  enable_snapshot_frame = tk.Frame(camera_settings_frame)
-  tk.Checkbutton(enable_snapshot_frame, text="Enable Snapshot at Start of Execution", variable=snapshot_bool, font=font_style, cursor="hand2").pack(side="left", anchor='w')
-  enable_snapshot_frame.pack(anchor='w')
+  camera_header = tk.Frame(camera_settings_frame, bg=SURFACE_BG)
+  camera_header.pack(fill="x", pady=(15, 10))
+  camera_settings_label = tk.Label(camera_header, text="📷 Camera Settings", 
+                                  font=header_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  camera_settings_label.pack(side="left", padx=(15, 0))
 
-  virtual_cam_frame = tk.Frame(camera_settings_frame)
-  tk.Checkbutton(virtual_cam_frame, text="Enable Virtual Camera", variable=virtual_cam_bool, font=font_style, cursor="hand2", command=toggle_spinbox_state).pack(side="left", anchor='w')
-  virtual_cam_frame.pack(anchor='w')
+  # Camera options with modern styling
+  always_on_cam_frame = tk.Frame(camera_settings_frame, bg=SURFACE_BG)
+  always_on_cam_frame.pack(anchor='w', fill='x', pady=3, padx=15)
+  tk.Checkbutton(always_on_cam_frame, text="Always On", variable=always_on_cam_bool, 
+                font=font_style, cursor="hand2", bg=SURFACE_BG, fg=TEXT_PRIMARY, 
+                selectcolor=ACCENT_BG, activebackground=SURFACE_BG, 
+                activeforeground=PRIMARY_COLOR, relief="flat", bd=0, 
+                highlightthickness=0).pack(side="left", anchor='w')
   
+  enable_snapshot_frame = tk.Frame(camera_settings_frame, bg=SURFACE_BG)
+  enable_snapshot_frame.pack(anchor='w', fill='x', pady=3, padx=15)
+  tk.Checkbutton(enable_snapshot_frame, text="Enable Snapshot at Start of Execution", 
+                variable=snapshot_bool, font=font_style, cursor="hand2", 
+                bg=SURFACE_BG, fg=TEXT_PRIMARY, selectcolor=ACCENT_BG, 
+                activebackground=SURFACE_BG, activeforeground=PRIMARY_COLOR, 
+                relief="flat", bd=0, highlightthickness=0).pack(side="left", anchor='w')
+
+  virtual_cam_frame = tk.Frame(camera_settings_frame, bg=SURFACE_BG)
+  virtual_cam_frame.pack(anchor='w', fill='x', pady=3, padx=15)
+  tk.Checkbutton(virtual_cam_frame, text="Enable Virtual Camera", 
+                variable=virtual_cam_bool, font=font_style, cursor="hand2", 
+                command=toggle_spinbox_state, bg=SURFACE_BG, fg=TEXT_PRIMARY, 
+                selectcolor=ACCENT_BG, activebackground=SURFACE_BG, 
+                activeforeground=PRIMARY_COLOR, relief="flat", bd=0, 
+                highlightthickness=0).pack(side="left", anchor='w')
+  
+  # Time delay settings
   minutes_var = tk.StringVar(value=minutes_default)
   seconds_var = tk.StringVar(value=seconds_default)
-  td_ob_frame = tk.Frame(camera_settings_frame)
-  seconds_spinbox = tk.Spinbox(td_ob_frame, textvariable=seconds_var, from_=0, to=59, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style)
-  seconds_spinbox.pack(side="right", padx=5)
-  minutes_spinbox = tk.Spinbox(td_ob_frame, textvariable=minutes_var, from_=0, to=1000, wrap=True, increment=1, validate="key", validatecommand=vcmd, width=5, font=font_style)
-  minutes_spinbox.pack(side="right", padx=10)
-  td_ob_frame.pack(anchor='w', padx=20)
-  tk.Label(camera_settings_frame, text="* Image switching delay in minutes and seconds", font=("Arial", 8), fg="red").pack(anchor="w", padx=30)
+  
+  delay_frame = tk.Frame(camera_settings_frame, bg=SURFACE_BG)
+  delay_frame.pack(anchor='w', fill='x', pady=5, padx=15)
+  
+  tk.Label(delay_frame, text="Virtual Camera Delay:", font=font_style, 
+           bg=SURFACE_BG, fg=TEXT_PRIMARY).pack(side="left", anchor='w')
+  
+  # Time picker container
+  time_container = tk.Frame(delay_frame, bg=SURFACE_BG)
+  time_container.pack(side="right", padx=(0, 10))
+  
+  minutes_spinbox = tk.Spinbox(time_container, textvariable=minutes_var, from_=0, to=1000, 
+                              wrap=True, increment=1, validate="key", validatecommand=vcmd, 
+                              width=5, font=font_style, justify="center",
+                              bg=ACCENT_BG, fg=TEXT_PRIMARY, relief="flat", bd=1,
+                              buttonbackground=ACCENT_BG, highlightthickness=0)
+  minutes_spinbox.pack(side="left", padx=5)
+  tk.Label(time_container, text="min", font=small_font, 
+           bg=SURFACE_BG, fg=TEXT_SECONDARY).pack(side="left", padx=(0, 10))
+  
+  seconds_spinbox = tk.Spinbox(time_container, textvariable=seconds_var, from_=0, to=59, 
+                              wrap=True, increment=1, validate="key", validatecommand=vcmd, 
+                              width=5, font=font_style, justify="center",
+                              bg=ACCENT_BG, fg=TEXT_PRIMARY, relief="flat", bd=1,
+                              buttonbackground=ACCENT_BG, highlightthickness=0)
+  seconds_spinbox.pack(side="left", padx=5)
+  tk.Label(time_container, text="sec", font=small_font, 
+           bg=SURFACE_BG, fg=TEXT_SECONDARY).pack(side="left")
+  
+  tk.Label(camera_settings_frame, text="⏱️ Image switching delay in minutes and seconds", 
+           font=small_font, fg=WARNING_COLOR, bg=SURFACE_BG).pack(anchor="w", pady=(5, 15), padx=15)
 
-  locations_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
-  locations_settings_frame.pack(padx=10, pady=(5,5), fill='x')
-  locations_settings_label = tk.Label(locations_settings_frame, text="Source/Destination Locations", font=("Arial", 12, 'bold'))
-  locations_settings_label.pack(padx=10, pady=5)
+  # Locations settings section with modern card design
+  locations_settings_frame = tk.Frame(settings_window, bg=SURFACE_BG, relief="flat", bd=0)
+  locations_settings_frame.pack(padx=20, pady=(0, 15), fill='x')
+  
+  locations_header = tk.Frame(locations_settings_frame, bg=SURFACE_BG)
+  locations_header.pack(fill="x", pady=(15, 10))
+  locations_settings_label = tk.Label(locations_header, text="📁 Source/Destination Locations", 
+                                     font=header_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  locations_settings_label.pack(side="left", padx=(15, 0))
 
   source_folder = tk.StringVar(value=image_source_path)
   destination_folder = tk.StringVar(value=image_destination_path)
 
-  source_frame = tk.Frame(locations_settings_frame)
-  source_frame.pack(padx=10, pady=5, anchor='w')
-  source_button = tk.Button(source_frame, text="Image Source Folder", command=lambda: choose_folder(source_folder, source_label), font=font_style, cursor="hand2")
-  source_button.pack(side="left", padx=5)
-  source_label = tk.Label(source_frame, textvariable=source_folder, font=font_style, anchor="w")
-  source_label.pack(side="left", padx=5)
+  # Source folder section
+  source_frame = tk.Frame(locations_settings_frame, bg=SURFACE_BG)
+  source_frame.pack(fill='x', pady=5, padx=15)
+  source_button = tk.Button(source_frame, text="📂 Image Source Folder", 
+                           command=lambda: choose_folder(source_folder, source_label), 
+                           font=font_style, cursor="hand2", bg=SECONDARY_COLOR, fg=DARK_BG,
+                           relief="flat", borderwidth=0, padx=10, pady=0,
+                           activebackground="#ff8555", activeforeground=DARK_BG)
+  source_button.pack(side="left", padx=(0, 10))
+  source_label = tk.Label(source_frame, textvariable=source_folder, font=small_font, 
+                         bg=SURFACE_BG, fg=TEXT_SECONDARY, anchor="w")
+  source_label.pack(side="left", fill='x', expand=True)
 
-  destination_frame = tk.Frame(locations_settings_frame)
-  destination_frame.pack(padx=10, pady=5, anchor='w')
-  destination_button = tk.Button(destination_frame, text="Image Destination Folder", command=lambda: choose_folder(destination_folder, destination_label), font=font_style, cursor="hand2")
-  destination_button.pack(side="left", padx=5)
-  destination_label = tk.Label(destination_frame, textvariable=destination_folder, font=font_style, anchor="w")
-  destination_label.pack(side="left", padx=5)
+  # Destination folder section
+  destination_frame = tk.Frame(locations_settings_frame, bg=SURFACE_BG)
+  destination_frame.pack(fill='x', pady=5, padx=15)
+  destination_button = tk.Button(destination_frame, text="📂 Image Destination Folder", 
+                                command=lambda: choose_folder(destination_folder, destination_label), 
+                                font=font_style, cursor="hand2", bg=SECONDARY_COLOR, fg=DARK_BG,
+                                relief="flat", borderwidth=0, padx=10, pady=0,
+                                activebackground="#ff8555", activeforeground=DARK_BG)
+  destination_button.pack(side="left", padx=(0, 10))
+  destination_label = tk.Label(destination_frame, textvariable=destination_folder, font=small_font, 
+                              bg=SURFACE_BG, fg=TEXT_SECONDARY, anchor="w")
+  destination_label.pack(side="left", fill='x', expand=True, pady=(0, 15))
   
-  schedules_settings_frame = tk.Frame(settings_window, borderwidth=1, relief="raised", bd=3)
-  schedules_settings_frame.pack(padx=10, pady=(5,5), fill='x')
-  camera_settings_label = tk.Label(schedules_settings_frame, text="Schedules", font=("Arial", 12, 'bold'), anchor="w")
-  camera_settings_label.pack(padx=10, pady=5)
+  # Schedules settings section with modern card design
+  schedules_settings_frame = tk.Frame(settings_window, bg=SURFACE_BG, relief="flat", bd=0)
+  schedules_settings_frame.pack(padx=20, pady=(0, 15), fill='x')
+  
+  schedules_header = tk.Frame(schedules_settings_frame, bg=SURFACE_BG)
+  schedules_header.pack(fill="x", pady=(15, 10))
+  schedules_settings_label = tk.Label(schedules_header, text="📅 Schedule Management", 
+                                     font=header_font, bg=SURFACE_BG, fg=PRIMARY_COLOR)
+  schedules_settings_label.pack(side="left", padx=(15, 0))
 
+  # Schedule buttons with modern styling
   for key, value in schedules.items():
-    button = tk.Button(schedules_settings_frame, text=key, font=font_style, cursor="hand2", command=lambda k=key, v=value: handle_button_schedule_click(k, v))
-    button.pack(padx=20, pady=(0,5), fill='x')
+    button = tk.Button(schedules_settings_frame, text=f"⏰ {key}", font=font_style, cursor="hand2", 
+                      command=lambda k=key, v=value: handle_button_schedule_click(k, v),
+                      bg=ACCENT_BG, fg=TEXT_PRIMARY, relief="flat", borderwidth=0,
+                      pady=0, activebackground=PRIMARY_COLOR, activeforeground=DARK_BG)
+    button.pack(padx=15, pady=(0, 8), fill='x')
+  
+  # Add padding at bottom
+  tk.Frame(schedules_settings_frame, bg=SURFACE_BG, height=15).pack()
 
-  bottom_frame = tk.Frame(settings_window)
-  bottom_frame.place(relx=0.5, rely=1.0, anchor="s")
-  tk.Button(bottom_frame, text="Save", command=save_changes, font=("Arial", 12, 'bold'), bg="green", fg="white", cursor="hand2", width=10).pack(side='left', pady=20, padx=5)
-  tk.Button(bottom_frame, text="Cancel", command=lambda: show_parent_window(settings_window), font=("Arial", 12, 'bold'), bg="gray", fg="white", cursor="hand2", width=10).pack(side='left', pady=20, padx=5)
+  # Bottom buttons with modern styling
+  bottom_frame = tk.Frame(settings_window, bg=DARK_BG)
+  bottom_frame.pack(fill="x", side="bottom", padx=20, pady=20)
+  
+  save_button = tk.Button(bottom_frame, text="💾 Save Configuration", command=save_changes, 
+                         font=button_font, bg=PRIMARY_COLOR, fg=DARK_BG, cursor="hand2",
+                         relief="flat", borderwidth=0, pady=12,
+                         activebackground="#00cc77", activeforeground=DARK_BG)
+  save_button.pack(side='left', fill='x', expand=True, padx=(0, 10))
+  
+  cancel_button = tk.Button(bottom_frame, text="❌ Cancel", 
+                           command=lambda: show_parent_window(settings_window), 
+                           font=button_font, bg=ERROR_COLOR, fg=TEXT_PRIMARY, cursor="hand2",
+                           relief="flat", borderwidth=0, pady=12,
+                           activebackground="#ff6b7a", activeforeground=TEXT_PRIMARY)
+  cancel_button.pack(side='right', fill='x', expand=True, padx=(10, 0))
 
   settings_window.mainloop()
